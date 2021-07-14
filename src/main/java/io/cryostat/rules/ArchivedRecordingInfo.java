@@ -35,60 +35,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.cryostat.recordings;
+package io.cryostat.rules;
 
-import java.nio.file.Path;
+import java.lang.reflect.Type;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
-import io.cryostat.MainModule;
-import io.cryostat.commands.internal.EventOptionsBuilder;
-import io.cryostat.core.log.Logger;
-import io.cryostat.core.sys.Clock;
-import io.cryostat.core.sys.FileSystem;
-import io.cryostat.messaging.notifications.NotificationFactory;
-import io.cryostat.net.TargetConnectionManager;
-import io.cryostat.net.reports.ReportService;
-import io.cryostat.net.web.WebServer;
-import io.cryostat.platform.PlatformClient;
+public class ArchivedRecordingInfo {
+    private final String encodedServiceUri;
+    private final String name;
+    private final String reportUrl;
+    private final String downloadUrl;
 
-import dagger.Module;
-import dagger.Provides;
-
-@Module
-public abstract class RecordingsModule {
-
-    @Provides
-    @Singleton
-    static RecordingTargetHelper provideRecordingTargetHelper(
-            TargetConnectionManager targetConnectionManager,
-            EventOptionsBuilder.Factory eventOptionsBuilderFactory,
-            NotificationFactory notificationFactory) {
-        return new RecordingTargetHelper(
-                targetConnectionManager, eventOptionsBuilderFactory, notificationFactory);
+    public ArchivedRecordingInfo(
+            String encodedServiceUri, String name, String reportUrl, String downloadUrl) {
+        this.encodedServiceUri = encodedServiceUri;
+        this.name = name;
+        this.reportUrl = reportUrl;
+        this.downloadUrl = downloadUrl;
     }
 
-    @Provides
-    @Singleton
-    static RecordingArchiveHelper provideRecordingArchiveHelper(
-            FileSystem fs,
-            Provider<WebServer> webServerProvider,
-            Logger logger,
-            @Named(MainModule.RECORDINGS_PATH) Path recordingsPath,
-            TargetConnectionManager targetConnectionManager,
-            Clock clock,
-            PlatformClient platformClient,
-            ReportService reportService) {
-        return new RecordingArchiveHelper(
-                fs,
-                webServerProvider,
-                logger,
-                recordingsPath,
-                targetConnectionManager,
-                clock,
-                platformClient,
-                reportService);
+    public String getEncodedServiceUri() {
+        return this.encodedServiceUri;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getReportUrl() {
+        return this.reportUrl;
+    }
+
+    public String getDownloadUrl() {
+        return this.downloadUrl;
+    }
+
+    public static class ArchivedRecordingInfoSerializer
+            implements JsonSerializer<ArchivedRecordingInfo> {
+        public JsonElement serialize(
+                ArchivedRecordingInfo archivedRecordingInfo,
+                Type typeOfArchivedRecordingInfo,
+                JsonSerializationContext context) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("name", archivedRecordingInfo.name);
+            jsonObject.addProperty("reportUrl", archivedRecordingInfo.reportUrl);
+            jsonObject.addProperty("downloadUrl", archivedRecordingInfo.downloadUrl);
+            return jsonObject;
+        }
     }
 }

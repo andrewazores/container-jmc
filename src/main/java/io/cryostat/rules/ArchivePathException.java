@@ -35,60 +35,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.cryostat.recordings;
+package io.cryostat.rules;
 
-import java.nio.file.Path;
-
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
-import io.cryostat.MainModule;
-import io.cryostat.commands.internal.EventOptionsBuilder;
-import io.cryostat.core.log.Logger;
-import io.cryostat.core.sys.Clock;
-import io.cryostat.core.sys.FileSystem;
-import io.cryostat.messaging.notifications.NotificationFactory;
-import io.cryostat.net.TargetConnectionManager;
-import io.cryostat.net.reports.ReportService;
-import io.cryostat.net.web.WebServer;
-import io.cryostat.platform.PlatformClient;
-
-import dagger.Module;
-import dagger.Provides;
-
-@Module
-public abstract class RecordingsModule {
-
-    @Provides
-    @Singleton
-    static RecordingTargetHelper provideRecordingTargetHelper(
-            TargetConnectionManager targetConnectionManager,
-            EventOptionsBuilder.Factory eventOptionsBuilderFactory,
-            NotificationFactory notificationFactory) {
-        return new RecordingTargetHelper(
-                targetConnectionManager, eventOptionsBuilderFactory, notificationFactory);
-    }
-
-    @Provides
-    @Singleton
-    static RecordingArchiveHelper provideRecordingArchiveHelper(
-            FileSystem fs,
-            Provider<WebServer> webServerProvider,
-            Logger logger,
-            @Named(MainModule.RECORDINGS_PATH) Path recordingsPath,
-            TargetConnectionManager targetConnectionManager,
-            Clock clock,
-            PlatformClient platformClient,
-            ReportService reportService) {
-        return new RecordingArchiveHelper(
-                fs,
-                webServerProvider,
-                logger,
-                recordingsPath,
-                targetConnectionManager,
-                clock,
-                platformClient,
-                reportService);
+public class ArchivePathException extends Exception {
+    public ArchivePathException(String path, String reason) {
+        super(String.format("Archive path %s %s", path, reason));
     }
 }

@@ -49,7 +49,6 @@ import io.cryostat.recordings.RecordingArchiveHelper;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -139,10 +138,7 @@ class PeriodicArchiverTest {
     void testPruneArchive() throws Exception {
         // get the archiver into a state where it is tracking a previously-archived recording
         testPerformArchival();
-
-        boolean result = archiver.pruneArchive(rule.getRecordingName() + "_1").get();
-
-        Assertions.assertTrue(result);
+        archiver.pruneArchive(rule.getRecordingName() + "_1");
         Mockito.verify(recordingArchiveHelper).deleteRecording(Mockito.any(), Mockito.anyString());
     }
 }
